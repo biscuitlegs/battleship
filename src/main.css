@@ -1,0 +1,58 @@
+:root {
+  --team1-color: green;
+  --team2-color: pink;
+}
+
+.gameboard {
+  display: grid;
+  grid-template-columns: repeat(10, 50px);
+  grid-template-rows: repeat(10, 50px);
+  width: 600px;
+  height: 600px;
+}
+
+.square {
+  border: 1px solid black;
+}
+
+.ship-square {
+  background-color: rgb(247, 122, 49);
+}
+
+.ship-square-hit {
+  background-color: rgb(131, 65, 26);
+}
+
+.team1-square {
+  background-color: var(--team1-color);
+}
+
+.team1-square-hit {
+  background: linear-gradient(135deg, #eceddc 25%, transparent 25%) 50px 0,
+    linear-gradient(225deg, #eceddc 25%, transparent 25%) 50px 0,
+    linear-gradient(315deg, #eceddc 25%, transparent 25%),
+    linear-gradient(45deg, #eceddc 25%, transparent 25%);
+  background-size: 20px 20px;
+  background-color: var(--team1-color);
+}
+
+.team2-square {
+  background: var(--team2-color);
+}
+
+.team2-square-hit {
+  background: linear-gradient(135deg, #eceddc 25%, transparent 25%) 50px 0,
+    linear-gradient(225deg, #eceddc 25%, transparent 25%) 50px 0,
+    linear-gradient(315deg, #eceddc 25%, transparent 25%),
+    linear-gradient(45deg, #eceddc 25%, transparent 25%);
+  background-size: 20px 20px;
+  background-color: var(--team-2-color);
+}
+
+.empty-square {
+  background-color: rgb(100, 100, 100);
+}
+
+.empty-square-hit {
+  background-color: rgb(54, 54, 54);
+}
