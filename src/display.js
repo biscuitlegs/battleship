@@ -1,23 +1,17 @@
 import _ from 'lodash'
 
 const Display = () => {
-  const createDisplayBoard = () => {
-    const gameBoard = document.createElement('div')
-    gameBoard.classList.add('gameboard')
+  const createGrid = () => {
+    const grid = document.createElement('div')
+    grid.classList.add('grid')
 
-    return gameBoard
-  }
-
-  const renderDisplayBoard = (container, displayBoard, displaySquares) => {
-    for (let i = 0; i < displaySquares.length; i++) {
-      displayBoard.appendChild(displaySquares[i])
-    }
-    container.appendChild(displayBoard)
+    return grid
   }
 
   const createDisplaySquare = (square) => {
-    const { shipId, hasBeenHit } = square
+    const { id, shipId, hasBeenHit } = square
     const squareElement = document.createElement('div')
+    squareElement.setAttribute('data-id', id)
     squareElement.classList.add('square')
     switch (true) {
       case !shipId && !hasBeenHit:
@@ -27,7 +21,8 @@ const Display = () => {
         squareElement.classList.add('empty-square-hit')
         break
       case shipId && !hasBeenHit:
-        squareElement.classList.add('ship-square')
+        // Was 'ship-square' before
+        squareElement.classList.add('empty-square')
         break
       case shipId && hasBeenHit:
         squareElement.classList.add('ship-square-hit')
@@ -37,10 +32,18 @@ const Display = () => {
     return squareElement
   }
 
+  const createDisplayBoard = (squares) => {
+    const grid = createGrid()
+    squares.forEach((square) => {
+      const displaySquare = createDisplaySquare(square)
+      grid.appendChild(displaySquare)
+    })
+
+    return grid
+  }
+
   return {
-    createDisplayBoard,
-    renderDisplayBoard,
-    createDisplaySquare
+    createDisplayBoard
   }
 }
 

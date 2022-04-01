@@ -1,19 +1,20 @@
 import _ from 'lodash'
+import uniqid from 'uniqid'
 
-const GameBoard = (square) => {
+const GameBoard = (square, playerId) => {
   const squares = []
   for (let i = 0; i < 10; i++) {
     squares.push([
-      square(),
-      square(),
-      square(),
-      square(),
-      square(),
-      square(),
-      square(),
-      square(),
-      square(),
-      square()
+      square(uniqid()),
+      square(uniqid()),
+      square(uniqid()),
+      square(uniqid()),
+      square(uniqid()),
+      square(uniqid()),
+      square(uniqid()),
+      square(uniqid()),
+      square(uniqid()),
+      square(uniqid())
     ])
   }
 
@@ -30,7 +31,7 @@ const GameBoard = (square) => {
     return squares[x][y]
   }
 
-  const isShipSunk = (shipId) => {
+  const allSquaresHit = (shipId) => {
     let isSunk = false
     const flatSquares = _.flattenDeep(squares)
     const squaresGroupedByShipId = _.groupBy(flatSquares, 'shipId')
@@ -45,7 +46,8 @@ const GameBoard = (square) => {
     squares,
     addShip,
     squareAt,
-    isShipSunk
+    allSquaresHit,
+    playerId
   }
 }
 

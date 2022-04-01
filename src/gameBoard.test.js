@@ -10,7 +10,11 @@ const unhitMockSquare = jest.fn().mockReturnValue({
   shipId: 350,
   hasBeenHit: false
 })
-const testGameBoard = GameBoard(mockSquare)
+const testGameBoard = GameBoard(mockSquare, 56)
+
+test("Should return it's player id", () => {
+  expect(testGameBoard.playerId).toBe(56)
+})
 
 test('Should return a grid of 10x10 squares', () => {
   const comparisonBoard = []
@@ -51,20 +55,20 @@ test("Should return a square when given it's coordinates", () => {
   expect(testGameBoard.squareAt([0, 0])).toBe(targetMockSquare)
 })
 
-test('Should return true if a ship has been sunk', () => {
+test("Should return true if all of a ship's squares have been hit", () => {
   testGameBoard.squares[0][0] = hitMockSquare()
   testGameBoard.squares[0][1] = hitMockSquare()
   testGameBoard.squares[0][2] = hitMockSquare()
   testGameBoard.squares[0][3] = hitMockSquare()
 
-  expect(testGameBoard.isShipSunk(350)).toBeTruthy()
+  expect(testGameBoard.allSquaresHit(350)).toBeTruthy()
 })
 
-test('Should return false if a ship has not been sunk', () => {
+test("Should return false if all of a ship's squares have not been hit", () => {
   testGameBoard.squares[0][0] = hitMockSquare()
   testGameBoard.squares[0][1] = hitMockSquare()
   testGameBoard.squares[0][2] = unhitMockSquare()
   testGameBoard.squares[0][3] = hitMockSquare()
 
-  expect(testGameBoard.isShipSunk(350)).toBeFalsy()
+  expect(testGameBoard.allSquaresHit(350)).toBeFalsy()
 })

@@ -1,5 +1,6 @@
-const Square = (shipId = null, hasBeenHit = false) => {
+const Square = (id, shipId = null, hasBeenHit = false) => {
   return {
+    id,
     shipId,
     hasBeenHit
   }

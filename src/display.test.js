@@ -6,70 +6,56 @@ import Display from './display'
 
 const testDisplay = Display()
 
-test('Should create a display board DOM element', () => {
-  const gameBoard = testDisplay.createDisplayBoard()
+describe('Should return a display board element', () => {
+  const emptyUnhitSquare = jest
+    .fn()
+    .mockReturnValue({ shipId: null, hasBeenHit: false })
+  const emptyHitSquare = jest
+    .fn()
+    .mockReturnValue({ shipId: null, hasBeenHit: true })
+  const shipUnhitSquare = jest
+    .fn()
+    .mockReturnValue({ shipId: 1, hasBeenHit: false })
+  const shipHitSquare = jest
+    .fn()
+    .mockReturnValue({ shipId: 1, hasBeenHit: true })
 
-  expect(gameBoard.classList.contains('gameboard')).toBeTruthy()
-})
+  test('with the correct number of squares', () => {
+    const displayBoard = testDisplay.createDisplayBoard([
+      emptyUnhitSquare(),
+      emptyUnhitSquare(),
+      emptyUnhitSquare()
+    ])
 
-test('Should render a display board DOM element in a container', () => {
-  const container = document.createElement('div')
-  const gameBoard = testDisplay.createDisplayBoard()
-  const squares = []
-  for (let i = 0; i < 3; i++) {
-    const square = document.createElement('div')
-    square.innerHTML = `Square ${i}`
-    squares.push(square)
-  }
-
-  testDisplay.renderDisplayBoard(container, gameBoard, squares)
-
-  expect(container.innerHTML).toBe(
-    `<div class="gameboard"><div>Square 0</div><div>Square 1</div><div>Square 2</div></div>`
-  )
-})
-
-describe('Should create a square DOM element with the correct background', () => {
-  const mockPlayer = jest.fn().mockReturnValue({ id: 1 })
-
-  test('when the square has no ship and is not hit', () => {
-    const mockSquare = jest
-      .fn()
-      .mockReturnValue({ shipId: null, hasBeenHit: false })
-    const square = testDisplay.createDisplaySquare(
-      new mockSquare(),
-      new mockPlayer()
-    )
-    expect(square.classList.contains('empty-square')).toBeTruthy()
+    expect(displayBoard.children.length).toBe(3)
   })
-  test('when the square has no ship and is hit', () => {
-    const mockSquare = jest
-      .fn()
-      .mockReturnValue({ shipId: null, hasBeenHit: true })
-    const square = testDisplay.createDisplaySquare(
-      new mockSquare(),
-      new mockPlayer()
-    )
-    expect(square.classList.contains('empty-square-hit')).toBeTruthy()
-  })
-  test('when the square has a ship and is not hit', () => {
-    const mockSquare = jest
-      .fn()
-      .mockReturnValue({ shipId: 1, hasBeenHit: false })
-    const square = testDisplay.createDisplaySquare(
-      new mockSquare(),
-      new mockPlayer()
-    )
-    expect(square.classList.contains('ship-square')).toBeTruthy()
-  })
-  test('when the square has a ship and is hit', () => {
-    const mockSquare = jest
-      .fn()
-      .mockReturnValue({ shipId: 1, hasBeenHit: true })
-    const square = testDisplay.createDisplaySquare(
-      new mockSquare(),
-      new mockPlayer()
-    )
-    expect(square.classList.contains('ship-square-hit')).toBeTruthy()
+
+  test('with each square having the correct classes', () => {
+    const displayBoard = testDisplay.createDisplayBoard([
+      emptyUnhitSquare(),
+      emptyHitSquare(),
+      shipUnhitSquare(),
+      shipHitSquare()
+    ])
+
+    const [
+      emptyUnhitSquareElement,
+      emptyHitSquareElement,
+      shipUnhitSquareElement,
+      shipHitSquareElement
+    ] = Array.from(displayBoard.children)
+
+    expect(
+      emptyUnhitSquareElement.classList.contains('square', 'empty-square')
+    ).toBeTruthy()
+    expect(
+      emptyHitSquareElement.classList.contains('square', 'empty-square-hit')
+    ).toBeTruthy()
+    expect(
+      shipUnhitSquareElement.classList.contains('square', 'ship-square')
+    ).toBeTruthy()
+    expect(
+      shipHitSquareElement.classList.contains('square', 'ship-square-hit')
+    ).toBeTruthy()
   })
 })
