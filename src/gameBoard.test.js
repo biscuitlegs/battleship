@@ -1,5 +1,5 @@
-import GameBoard from './gameBoard'
 import _ from 'lodash'
+import GameBoard from './gameBoard'
 
 const mockSquare = jest.fn().mockReturnValue({ shipId: null })
 const hitMockSquare = jest.fn().mockReturnValue({
@@ -18,7 +18,7 @@ test("Should return it's player id", () => {
 
 test('Should return a grid of 10x10 squares', () => {
   const comparisonBoard = []
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 10; i += 1) {
     comparisonBoard.push([
       { shipId: null },
       { shipId: null },
@@ -43,14 +43,14 @@ test('Should add a ship to the board at the given squares', () => {
     [0, 1],
     [0, 2]
   ])
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i += 1) {
     expect(testGameBoard.squares[0][i].shipId).toBe(256)
   }
 })
 
 test("Should return a square when given it's coordinates", () => {
-  const mockSquare = jest.fn().mockReturnValue({ shipId: 43562 })
-  const targetMockSquare = mockSquare()
+  const mockSquareFactory = jest.fn().mockReturnValue({ shipId: 43562 })
+  const targetMockSquare = mockSquareFactory()
   testGameBoard.squares[0][0] = targetMockSquare
   expect(testGameBoard.squareAt([0, 0])).toBe(targetMockSquare)
 })

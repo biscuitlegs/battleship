@@ -6,6 +6,48 @@ import Display from './display'
 
 const testDisplay = Display()
 
+test('It creates an element that shows the state of both boards', () => {
+  // const boardsResult = document.createElement('div')
+  const mockDisplayBoard1 = document.createElement('div')
+  const mockDisplayBoard2 = document.createElement('div')
+  const resultsDisplay = testDisplay.createResultsDisplay(
+    mockDisplayBoard1,
+    mockDisplayBoard2
+  )
+
+  expect(mockDisplayBoard1.classList.contains('small-grid')).toBeTruthy()
+  expect(mockDisplayBoard2.classList.contains('small-grid')).toBeTruthy()
+  expect(resultsDisplay.classList.contains('results-display')).toBeTruthy()
+  expect(resultsDisplay.childNodes[0]).toBe(mockDisplayBoard1)
+  expect(resultsDisplay.childNodes[1]).toBe(mockDisplayBoard2)
+})
+
+/*
+test('It reveals unhit squares that have a ship', () => {
+  const displayBoard = document.createElement('div')
+  const displaySquareA = document.createElement('div')
+  const displaySquareB = document.createElement('div')
+  displaySquareA.dataset.id = 'abc123'
+  displaySquareB.dataset.id = 'xyz456'
+  displayBoard.appendChild(displaySquareA)
+  displayBoard.appendChild(displaySquareB)
+
+  const mockSquareA = jest
+    .fn()
+    .mockReturnValue({ id: 'abc123', shipId: null, hasBeenHit: false })()
+  const mockSquareB = jest
+    .fn()
+    .mockReturnValue({ id: 'xyz456', shipId: 5, hasBeenHit: false })()
+  const mockGameBoard = jest
+    .fn()
+    .mockReturnValue({ squares: [mockSquareA, mockSquareB] })()
+
+  testDisplay.revealUnhitSquares(displayBoard, mockGameBoard)
+
+  expect(displaySquareB.classList.contains('revealed')).toBeTruthy()
+})
+*/
+
 describe('Should return a display board element', () => {
   const emptyUnhitSquare = jest
     .fn()
@@ -27,7 +69,7 @@ describe('Should return a display board element', () => {
       emptyUnhitSquare()
     ])
 
-    expect(displayBoard.children.length).toBe(3)
+    expect(displayBoard.children).toHaveLength(3)
   })
 
   test('with each square having the correct classes', () => {

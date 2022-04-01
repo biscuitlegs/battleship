@@ -1,27 +1,59 @@
+:root {
+  --red: rgb(202, 45, 45);
+  --black: rgb(0, 0, 0);
+  --grey: rgb(100, 100, 100);
+  --dark-grey: rgb(54, 54, 54);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(10, 50px);
   grid-template-rows: repeat(10, 50px);
-  width: 600px;
-  height: 600px;
+  width: 500px;
+  height: 500px;
+}
+
+.small-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 25px);
+  grid-template-rows: repeat(10, 25px);
+  width: 250px;
+  height: 250px;
+}
+
+div .revealed {
+  border: 2px dashed var(--red);
+}
+
+.results-display {
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+  grid-template-rows: 100%;
+  column-gap: 10px;
+  width: 500px;
+  height: 500px;
+}
+
+.disabled {
+  pointer-events: none;
 }
 
 .square {
-  border: 1px solid black;
+  border: 1px solid var(--black);
 }
 
 .ship-square {
-  background-color: rgb(202, 45, 45);
+  background-color: var(--red);
 }
 
 .ship-square-hit {
-  background-color: rgb(202, 45, 45);
+  background-color: var(--red);
 }
 
 .empty-square {
-  background-color: rgb(100, 100, 100);
+  background-color: var(--grey);
 }
 
 .empty-square-hit {
-  background-color: rgb(54, 54, 54);
+  background-color: var(--dark-grey);
 }

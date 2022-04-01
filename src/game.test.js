@@ -1,1 +1,3 @@
-import Game from './game'
+// import Game from './game'
+
+test.skip('Default', () => {})

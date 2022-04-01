@@ -3,7 +3,7 @@ import uniqid from 'uniqid'
 
 const GameBoard = (square, playerId) => {
   const squares = []
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 10; i += 1) {
     squares.push([
       square(uniqid()),
       square(uniqid()),
@@ -35,7 +35,11 @@ const GameBoard = (square, playerId) => {
     let isSunk = false
     const flatSquares = _.flattenDeep(squares)
     const squaresGroupedByShipId = _.groupBy(flatSquares, 'shipId')
-    if (squaresGroupedByShipId[shipId].every((square) => square.hasBeenHit)) {
+    if (
+      squaresGroupedByShipId[shipId].every(
+        (groupedSquare) => groupedSquare.hasBeenHit
+      )
+    ) {
       isSunk = true
     }
 

@@ -9,8 +9,8 @@ import Player from './player'
 import './main.css'
 
 const Game = () => {
+  const { createDisplayBoard, createResultsDisplay } = Display()
   const players = [Player(uniqid(), 'Mark'), Player(uniqid(), 'Emma')]
-  let turnNumber = 1
   let turnPlayer = players[0]
   const player1Ships = [
     Ship(uniqid(), players[0].id, false, [
@@ -75,16 +75,6 @@ const Game = () => {
     }
   }
 
-  const reloadDisplayBoard = () => {
-    const currentDisplayBoard = document.body.querySelector('#displayBoard')
-    document.body.removeChild(currentDisplayBoard)
-    const newDisplayBoard = Display().createDisplayBoard(
-      _.flattenDeep(turnGameBoard.squares)
-    )
-    newDisplayBoard.setAttribute('id', 'displayBoard')
-    document.body.appendChild(newDisplayBoard)
-  }
-
   const changeTurnPlayer = () => {
     turnPlayer = turnPlayer === players[0] ? players[1] : players[0]
   }
@@ -104,40 +94,78 @@ const Game = () => {
       )
 
       displaySquare.addEventListener('click', () => {
-        foundSquare.hasBeenHit = true
-        reloadDisplayBoard()
-        sleep(1500).then(() => {
-          changeTurnPlayer()
-          changeTurnGameBoard()
-          reloadDisplayBoard()
-          updateSunkShips()
-          if (isWinner()) {
-            console.log('Gameover')
-            return
-          }
-          turnNumber += 1
-          playTurn()
-        })
+        // eslint-disable-next-line no-use-before-define
+        playTurn(foundSquare)
       })
     })
   }
 
-  const playTurn = () => {
-    console.log(`It's ${turnPlayer.name}'s turn.`)
-    if (turnNumber === 1) {
-      const displayBoard = Display().createDisplayBoard(
-        _.flattenDeep(turnGameBoard.squares)
-      )
-      displayBoard.setAttribute('id', 'displayBoard')
-      document.body.appendChild(displayBoard)
-      makeSquaresInteractive(displayBoard)
-    } else {
-      const displayBoard = document.body.querySelector('#displayBoard')
-      makeSquaresInteractive(displayBoard)
-    }
+  const disableDisplayBoard = () => {
+    const displayBoard = document.querySelector('#displayBoard')
+    displayBoard.classList.add('disabled')
   }
 
-  playTurn()
+  const loadDisplayBoard = () => {
+    const displayBoard = createDisplayBoard(
+      _.flattenDeep(turnGameBoard.squares)
+    )
+    displayBoard.setAttribute('id', 'displayBoard')
+    document.body.appendChild(displayBoard)
+    makeSquaresInteractive(displayBoard)
+  }
+
+  const unloadDisplayBoard = () => {
+    const displayBoard = document.body.querySelector('#displayBoard')
+    document.body.removeChild(displayBoard)
+  }
+
+  const reloadDisplayBoard = () => {
+    unloadDisplayBoard()
+    loadDisplayBoard()
+  }
+
+  const loadResultsDisplay = () => {
+    const player1DisplayBoard = createDisplayBoard(
+      _.flattenDeep(player1GameBoard.squares)
+    )
+    const player2DisplayBoard = createDisplayBoard(
+      _.flattenDeep(player2GameBoard.squares)
+    )
+    const resultsDisplay = createResultsDisplay(
+      player1DisplayBoard,
+      player2DisplayBoard,
+      player1GameBoard,
+      player2GameBoard
+    )
+    document.body.appendChild(resultsDisplay)
+  }
+
+  const playTurn = (square) => {
+    const clickedSquare = square
+    clickedSquare.hasBeenHit = true
+    updateSunkShips()
+    reloadDisplayBoard()
+    disableDisplayBoard()
+    if (isWinner()) {
+      console.log('Gameover')
+      unloadDisplayBoard()
+      loadResultsDisplay()
+      return
+    }
+    changeTurnPlayer()
+    changeTurnGameBoard()
+    sleep(1500).then(() => {
+      reloadDisplayBoard()
+    })
+  }
+
+  const play = () => {
+    loadDisplayBoard()
+  }
+
+  return {
+    play
+  }
 }
 
 export default Game

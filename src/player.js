@@ -1,8 +1,6 @@
-const Player = (id, name = `Player ${id}`) => {
-  return {
-    id,
-    name
-  }
-}
+const Player = (id, name = `Player ${id}`) => ({
+  id,
+  name
+})
 
 export default Player

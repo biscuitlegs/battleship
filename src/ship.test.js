@@ -7,7 +7,7 @@ const testShip = Ship(5, 1, false, [
 ])
 
 test("Should return it's length", () => {
-  expect(testShip.length).toBe(3)
+  expect(testShip).toHaveLength(3)
 })
 
 test('Should return each of the positions it is occupying', () => {
