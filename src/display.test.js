@@ -6,47 +6,53 @@ import Display from './display'
 
 const testDisplay = Display()
 
-test('It creates an element that shows the state of both boards', () => {
-  // const boardsResult = document.createElement('div')
+test('Should create an element for displaying notifications', () => {
+  const notification = testDisplay.createNotificationDisplay('Hello World!')
+
+  expect(notification.classList.contains('notification')).toBeTruthy()
+  expect(notification.textContent).toBe('Hello World!')
+})
+
+describe('Should create a results display', () => {
+  const mockGameBoard = jest.fn().mockReturnValue({ squares: [] })
   const mockDisplayBoard1 = document.createElement('div')
   const mockDisplayBoard2 = document.createElement('div')
+  const player1Name = 'Mark'
+  const player2Name = 'Karen'
+  const player1Id = 54
   const resultsDisplay = testDisplay.createResultsDisplay(
     mockDisplayBoard1,
-    mockDisplayBoard2
+    mockDisplayBoard2,
+    mockGameBoard(),
+    mockGameBoard(),
+    player1Name,
+    player2Name,
+    player1Id,
+    player1Id
   )
+  const columns = resultsDisplay.childNodes
 
-  expect(mockDisplayBoard1.classList.contains('small-grid')).toBeTruthy()
-  expect(mockDisplayBoard2.classList.contains('small-grid')).toBeTruthy()
-  expect(resultsDisplay.classList.contains('results-display')).toBeTruthy()
-  expect(resultsDisplay.childNodes[0]).toBe(mockDisplayBoard1)
-  expect(resultsDisplay.childNodes[1]).toBe(mockDisplayBoard2)
+  test('that has two columns', () => {
+    expect(columns).toHaveLength(2)
+    columns.forEach((column) =>
+      expect(column.classList.contains('results-display-column')).toBeTruthy()
+    )
+  })
+
+  test('that has a player name in each column', () => {
+    expect(columns[0].textContent).toBe(player1Name)
+    expect(columns[1].textContent).toBe(player2Name)
+  })
+
+  test('that has a display board in each column', () => {
+    expect(columns[0].childNodes).toContain(mockDisplayBoard1)
+    expect(columns[1].childNodes).toContain(mockDisplayBoard2)
+  })
+
+  test('that returns an results display element', () => {
+    expect(resultsDisplay.classList.contains('results-display')).toBeTruthy()
+  })
 })
-
-/*
-test('It reveals unhit squares that have a ship', () => {
-  const displayBoard = document.createElement('div')
-  const displaySquareA = document.createElement('div')
-  const displaySquareB = document.createElement('div')
-  displaySquareA.dataset.id = 'abc123'
-  displaySquareB.dataset.id = 'xyz456'
-  displayBoard.appendChild(displaySquareA)
-  displayBoard.appendChild(displaySquareB)
-
-  const mockSquareA = jest
-    .fn()
-    .mockReturnValue({ id: 'abc123', shipId: null, hasBeenHit: false })()
-  const mockSquareB = jest
-    .fn()
-    .mockReturnValue({ id: 'xyz456', shipId: 5, hasBeenHit: false })()
-  const mockGameBoard = jest
-    .fn()
-    .mockReturnValue({ squares: [mockSquareA, mockSquareB] })()
-
-  testDisplay.revealUnhitSquares(displayBoard, mockGameBoard)
-
-  expect(displaySquareB.classList.contains('revealed')).toBeTruthy()
-})
-*/
 
 describe('Should return a display board element', () => {
   const emptyUnhitSquare = jest
@@ -55,12 +61,12 @@ describe('Should return a display board element', () => {
   const emptyHitSquare = jest
     .fn()
     .mockReturnValue({ shipId: null, hasBeenHit: true })
-  const shipUnhitSquare = jest
-    .fn()
-    .mockReturnValue({ shipId: 1, hasBeenHit: false })
   const shipHitSquare = jest
     .fn()
     .mockReturnValue({ shipId: 1, hasBeenHit: true })
+  const shipSunkSquare = jest
+    .fn()
+    .mockReturnValue({ shipId: 1, hasBeenHit: true, hasBeenSunk: true })
 
   test('with the correct number of squares', () => {
     const displayBoard = testDisplay.createDisplayBoard([
@@ -76,28 +82,28 @@ describe('Should return a display board element', () => {
     const displayBoard = testDisplay.createDisplayBoard([
       emptyUnhitSquare(),
       emptyHitSquare(),
-      shipUnhitSquare(),
-      shipHitSquare()
+      shipHitSquare(),
+      shipSunkSquare()
     ])
 
     const [
       emptyUnhitSquareElement,
       emptyHitSquareElement,
-      shipUnhitSquareElement,
-      shipHitSquareElement
+      shipHitSquareElement,
+      shipSunkSquareElement
     ] = Array.from(displayBoard.children)
 
     expect(
-      emptyUnhitSquareElement.classList.contains('square', 'empty-square')
+      emptyUnhitSquareElement.classList.contains('empty-square')
     ).toBeTruthy()
     expect(
-      emptyHitSquareElement.classList.contains('square', 'empty-square-hit')
+      emptyHitSquareElement.classList.contains('empty-square-hit')
     ).toBeTruthy()
     expect(
-      shipUnhitSquareElement.classList.contains('square', 'ship-square')
+      shipHitSquareElement.classList.contains('ship-square-hit')
     ).toBeTruthy()
     expect(
-      shipHitSquareElement.classList.contains('square', 'ship-square-hit')
+      shipSunkSquareElement.classList.contains('ship-square-sunk')
     ).toBeTruthy()
   })
 })

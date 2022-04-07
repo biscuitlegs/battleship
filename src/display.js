@@ -9,7 +9,7 @@ const Display = () => {
   }
 
   const createDisplaySquare = (square) => {
-    const { id, shipId, hasBeenHit } = square
+    const { id, shipId, hasBeenHit, hasBeenSunk } = square
     const squareElement = document.createElement('div')
     squareElement.setAttribute('data-id', id)
     squareElement.classList.add('square')
@@ -22,6 +22,9 @@ const Display = () => {
         break
       case shipId && !hasBeenHit:
         squareElement.classList.add('empty-square')
+        break
+      case shipId && hasBeenHit && hasBeenSunk:
+        squareElement.classList.add('ship-square-sunk')
         break
       case shipId && hasBeenHit:
         squareElement.classList.add('ship-square-hit')
@@ -58,23 +61,54 @@ const Display = () => {
     displayBoard1,
     displayBoard2,
     gameBoard1,
-    gameBoard2
+    gameBoard2,
+    player1Name,
+    player2Name,
+    player1Id,
+    winningPlayerId
   ) => {
     const resultsDisplay = document.createElement('div')
+    const player1NameDisplay = document.createElement('h3')
+    player1NameDisplay.textContent = player1Name
+    const player2NameDisplay = document.createElement('h3')
+    player2NameDisplay.textContent = player2Name
+    const column1 = document.createElement('div')
+    const column2 = document.createElement('div')
+    column1.classList.add('results-display-column')
+    column2.classList.add('results-display-column')
+    if (winningPlayerId === player1Id) {
+      column1.classList.add('winner-column')
+    } else {
+      column2.classList.add('winner-column')
+    }
     displayBoard1.classList.add('small-grid')
     displayBoard2.classList.add('small-grid')
     revealUnhitSquares(displayBoard1, gameBoard1)
     revealUnhitSquares(displayBoard2, gameBoard2)
     resultsDisplay.classList.add('results-display')
-    resultsDisplay.appendChild(displayBoard1)
-    resultsDisplay.appendChild(displayBoard2)
+
+    column1.appendChild(player1NameDisplay)
+    column1.appendChild(displayBoard1)
+    column2.appendChild(player2NameDisplay)
+    column2.appendChild(displayBoard2)
+    resultsDisplay.appendChild(column1)
+    resultsDisplay.appendChild(column2)
 
     return resultsDisplay
   }
 
+  const createNotificationDisplay = (text) => {
+    const notification = document.createElement('div')
+    notification.classList.add('notification')
+    notification.textContent = text
+
+    return notification
+  }
+
   return {
     createDisplayBoard,
-    createResultsDisplay
+    createResultsDisplay,
+    createNotificationDisplay
   }
 }
 

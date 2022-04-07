@@ -24,3 +24,13 @@ test('Should return a ship id if one is assigned', () => {
   const testSquare = Square(1, 5)
   expect(testSquare.shipId).toBe(5)
 })
+
+test("Should return true if it's ship has been sunk", () => {
+  const testSquare = Square(1, 5, true, true)
+  expect(testSquare.hasBeenSunk).toBe(true)
+})
+
+test("Should return false if it's ship has not been sunk", () => {
+  const testSquare = Square(1, 5, true, false)
+  expect(testSquare.hasBeenSunk).toBe(false)
+})

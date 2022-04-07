@@ -1,7 +1,13 @@
-const Square = (id, shipId = null, hasBeenHit = false) => ({
+const Square = (
+  id,
+  shipId = null,
+  hasBeenHit = false,
+  hasBeenSunk = false
+) => ({
   id,
   shipId,
-  hasBeenHit
+  hasBeenHit,
+  hasBeenSunk
 })
 
 export default Square

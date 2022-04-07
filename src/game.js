@@ -9,18 +9,22 @@ import Player from './player'
 import './main.css'
 
 const Game = () => {
-  const { createDisplayBoard, createResultsDisplay } = Display()
+  const {
+    createDisplayBoard,
+    createResultsDisplay,
+    createNotificationDisplay
+  } = Display()
   const players = [Player(uniqid(), 'Mark'), Player(uniqid(), 'Emma')]
   let turnPlayer = players[0]
   const player1Ships = [
     Ship(uniqid(), players[0].id, false, [
       [0, 0],
       [0, 1]
-    ]),
+    ]) /* ,
     Ship(uniqid(), players[0].id, false, [
       [1, 4],
       [1, 5]
-    ])
+    ]) */
   ]
   const player2Ships = [
     Ship(uniqid(), players[1].id, false, [
@@ -60,6 +64,21 @@ const Game = () => {
       if (player1GameBoard.allSquaresHit(ship.id)) {
         const sunkShip = ship
         sunkShip.isSunk = true
+      }
+    })
+  }
+
+  const updateSunkSquares = () => {
+    const squares = _.flattenDeep(turnGameBoard.squares)
+    const ships = [...player1Ships, ...player2Ships]
+    ships.forEach((ship) => {
+      if (ship.isSunk) {
+        squares.forEach((square) => {
+          if (square.shipId === ship.id) {
+            const sunkSquare = square
+            sunkSquare.hasBeenSunk = true
+          }
+        })
       }
     })
   }
@@ -106,9 +125,8 @@ const Game = () => {
   }
 
   const loadDisplayBoard = () => {
-    const displayBoard = createDisplayBoard(
-      _.flattenDeep(turnGameBoard.squares)
-    )
+    const displaySquares = _.flattenDeep(turnGameBoard.squares)
+    const displayBoard = createDisplayBoard(displaySquares)
     displayBoard.setAttribute('id', 'displayBoard')
     document.body.appendChild(displayBoard)
     makeSquaresInteractive(displayBoard)
@@ -135,19 +153,37 @@ const Game = () => {
       player1DisplayBoard,
       player2DisplayBoard,
       player1GameBoard,
-      player2GameBoard
+      player2GameBoard,
+      players[0].name,
+      players[1].name,
+      players[0].id,
+      turnPlayer.id
     )
     document.body.appendChild(resultsDisplay)
+  }
+
+  const loadTurnNotification = () => {
+    const turnNotification = createNotificationDisplay(
+      `It's ${turnPlayer.name}'s turn.`
+    )
+    turnNotification.setAttribute('id', 'turnNotification')
+    document.body.appendChild(turnNotification)
+  }
+
+  const unloadTurnNotification = () => {
+    const turnNotification = document.querySelector('#turnNotification')
+    document.body.removeChild(turnNotification)
   }
 
   const playTurn = (square) => {
     const clickedSquare = square
     clickedSquare.hasBeenHit = true
     updateSunkShips()
+    updateSunkSquares()
     reloadDisplayBoard()
     disableDisplayBoard()
     if (isWinner()) {
-      console.log('Gameover')
+      unloadTurnNotification()
       unloadDisplayBoard()
       loadResultsDisplay()
       return
@@ -155,11 +191,14 @@ const Game = () => {
     changeTurnPlayer()
     changeTurnGameBoard()
     sleep(1500).then(() => {
+      unloadTurnNotification()
+      loadTurnNotification()
       reloadDisplayBoard()
     })
   }
 
   const play = () => {
+    loadTurnNotification()
     loadDisplayBoard()
   }
 
