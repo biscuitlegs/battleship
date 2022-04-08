@@ -69,9 +69,14 @@ const Display = () => {
   ) => {
     const resultsDisplay = document.createElement('div')
     const player1NameDisplay = document.createElement('h3')
-    player1NameDisplay.textContent = player1Name
     const player2NameDisplay = document.createElement('h3')
-    player2NameDisplay.textContent = player2Name
+    if (winningPlayerId === player1Id) {
+      player1NameDisplay.textContent = `${player1Name} wins!`
+      player2NameDisplay.textContent = player2Name
+    } else {
+      player2NameDisplay.textContent = `${player2Name} wins!`
+      player1NameDisplay.textContent = player1Name
+    }
     const column1 = document.createElement('div')
     const column2 = document.createElement('div')
     column1.classList.add('results-display-column')
@@ -105,10 +110,19 @@ const Display = () => {
     return notification
   }
 
+  const createPlayAgainButton = () => {
+    const button = document.createElement('button')
+    button.textContent = 'Play again'
+    button.classList.add('button')
+
+    return button
+  }
+
   return {
     createDisplayBoard,
     createResultsDisplay,
-    createNotificationDisplay
+    createNotificationDisplay,
+    createPlayAgainButton
   }
 }
 

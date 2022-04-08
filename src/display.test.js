@@ -6,6 +6,11 @@ import Display from './display'
 
 const testDisplay = Display()
 
+test("Should create a 'play again' button", () => {
+  const button = testDisplay.createPlayAgainButton()
+  expect(button.classList.contains('button')).toBeTruthy()
+})
+
 test('Should create an element for displaying notifications', () => {
   const notification = testDisplay.createNotificationDisplay('Hello World!')
 
@@ -40,8 +45,8 @@ describe('Should create a results display', () => {
   })
 
   test('that has a player name in each column', () => {
-    expect(columns[0].textContent).toBe(player1Name)
-    expect(columns[1].textContent).toBe(player2Name)
+    expect(columns[0].textContent).toContain(player1Name)
+    expect(columns[1].textContent).toContain(player2Name)
   })
 
   test('that has a display board in each column', () => {

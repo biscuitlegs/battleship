@@ -12,21 +12,22 @@ const Game = () => {
   const {
     createDisplayBoard,
     createResultsDisplay,
-    createNotificationDisplay
+    createNotificationDisplay,
+    createPlayAgainButton
   } = Display()
   const players = [Player(uniqid(), 'Mark'), Player(uniqid(), 'Emma')]
   let turnPlayer = players[0]
-  const player1Ships = [
+  let player1Ships = [
     Ship(uniqid(), players[0].id, false, [
       [0, 0],
       [0, 1]
-    ]) /* ,
+    ]),
     Ship(uniqid(), players[0].id, false, [
       [1, 4],
       [1, 5]
-    ]) */
+    ])
   ]
-  const player2Ships = [
+  let player2Ships = [
     Ship(uniqid(), players[1].id, false, [
       [3, 0],
       [3, 1]
@@ -36,8 +37,8 @@ const Game = () => {
       [5, 4]
     ])
   ]
-  const player1GameBoard = GameBoard(Square, players[0].id)
-  const player2GameBoard = GameBoard(Square, players[1].id)
+  let player1GameBoard = GameBoard(Square, players[0].id)
+  let player2GameBoard = GameBoard(Square, players[1].id)
   let turnGameBoard = player1GameBoard
   // Player 1's board only has player 2's ships and vice versa because
   // each player should only fight their opponent's ships
@@ -186,6 +187,8 @@ const Game = () => {
       unloadTurnNotification()
       unloadDisplayBoard()
       loadResultsDisplay()
+      // eslint-disable-next-line no-use-before-define
+      loadPlayAgainButton()
       return
     }
     changeTurnPlayer()
@@ -200,6 +203,46 @@ const Game = () => {
   const play = () => {
     loadTurnNotification()
     loadDisplayBoard()
+  }
+
+  const loadPlayAgainButton = () => {
+    const button = createPlayAgainButton()
+    button.addEventListener('click', () => {
+      document.body.innerHTML = ''
+      // eslint-disable-next-line prefer-destructuring
+      turnPlayer = players[0]
+      player1Ships = [
+        Ship(uniqid(), players[0].id, false, [
+          [0, 0],
+          [0, 1]
+        ]),
+        Ship(uniqid(), players[0].id, false, [
+          [1, 4],
+          [1, 5]
+        ])
+      ]
+      player2Ships = [
+        Ship(uniqid(), players[1].id, false, [
+          [3, 0],
+          [3, 1]
+        ]),
+        Ship(uniqid(), players[1].id, false, [
+          [5, 3],
+          [5, 4]
+        ])
+      ]
+      player1GameBoard = GameBoard(Square, players[0].id)
+      player2GameBoard = GameBoard(Square, players[1].id)
+      turnGameBoard = player1GameBoard
+      player1Ships.forEach((ship) => {
+        player2GameBoard.addShip(ship.id, ship.positions)
+      })
+      player2Ships.forEach((ship) => {
+        player1GameBoard.addShip(ship.id, ship.positions)
+      })
+      play()
+    })
+    document.body.appendChild(button)
   }
 
   return {
