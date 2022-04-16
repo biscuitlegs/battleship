@@ -2,7 +2,7 @@ import _ from 'lodash'
 import uniqid from 'uniqid'
 import GameBoard from './gameBoard'
 import Square from './square'
-import Ship from './ship'
+import { Ship } from './ship'
 import Display from './display'
 import Player from './player'
 
@@ -13,26 +13,24 @@ const Game = () => {
     createDisplayBoard,
     createResultsDisplay,
     createNotificationDisplay,
-    createPlayAgainButton
+    createPlayAgainButton,
+    createDragShipsDisplay
   } = Display()
   const players = [Player(uniqid(), 'Mark'), Player(uniqid(), 'Emma')]
   let turnPlayer = players[0]
   let player1Ships = [
-    Ship(uniqid(), players[0].id, false, [
+    Ship(uniqid(), players[0].id, false, false, [
       [0, 0],
-      [0, 1]
-    ]),
-    Ship(uniqid(), players[0].id, false, [
-      [1, 4],
-      [1, 5]
+      [0, 1],
+      [0, 2]
     ])
   ]
   let player2Ships = [
-    Ship(uniqid(), players[1].id, false, [
+    Ship(uniqid(), players[1].id, false, false, [
       [3, 0],
       [3, 1]
     ]),
-    Ship(uniqid(), players[1].id, false, [
+    Ship(uniqid(), players[1].id, false, false, [
       [5, 3],
       [5, 4]
     ])
@@ -244,6 +242,10 @@ const Game = () => {
     })
     document.body.appendChild(button)
   }
+
+  document.body.appendChild(
+    createDragShipsDisplay(player1Ships, player1GameBoard)
+  )
 
   return {
     play

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import GameBoard from './gameBoard'
 
-const mockSquare = jest.fn().mockReturnValue({ shipId: null })
+const mockSquare = jest.fn().mockReturnValue({ id: null, shipId: null })
 const hitMockSquare = jest.fn().mockReturnValue({
   shipId: 350,
   hasBeenHit: true
@@ -20,16 +20,16 @@ test('Should return a grid of 10x10 squares', () => {
   const comparisonBoard = []
   for (let i = 0; i < 10; i += 1) {
     comparisonBoard.push([
-      { shipId: null },
-      { shipId: null },
-      { shipId: null },
-      { shipId: null },
-      { shipId: null },
-      { shipId: null },
-      { shipId: null },
-      { shipId: null },
-      { shipId: null },
-      { shipId: null }
+      { id: null, shipId: null },
+      { id: null, shipId: null },
+      { id: null, shipId: null },
+      { id: null, shipId: null },
+      { id: null, shipId: null },
+      { id: null, shipId: null },
+      { id: null, shipId: null },
+      { id: null, shipId: null },
+      { id: null, shipId: null },
+      { id: null, shipId: null }
     ])
   }
   expect(_.flattenDeep(testGameBoard.squares)).toEqual(
@@ -71,4 +71,18 @@ test("Should return false if all of a ship's squares have not been hit", () => {
   testGameBoard.squares[0][3] = hitMockSquare()
 
   expect(testGameBoard.allSquaresHit(350)).toBeFalsy()
+})
+
+test("Should return a square's coordinates when given it's id", () => {
+  const mockSmallIdSquare = jest.fn().mockReturnValue({ id: 4 })()
+  const mockLargeIdSquare = jest.fn().mockReturnValue({ id: 55 })()
+  testGameBoard.squares[0][1] = mockSmallIdSquare
+  testGameBoard.squares[4][3] = mockLargeIdSquare
+
+  expect(testGameBoard.coordinatesOf(mockSmallIdSquare.id)).toStrictEqual([
+    0, 1
+  ])
+  expect(testGameBoard.coordinatesOf(mockLargeIdSquare.id)).toStrictEqual([
+    4, 3
+  ])
 })

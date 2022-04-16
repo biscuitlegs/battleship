@@ -31,6 +31,21 @@ const GameBoard = (square, playerId) => {
     return squares[x][y]
   }
 
+  const coordinatesOf = (id) => {
+    const squareWithId = _.flattenDeep(squares).find(
+      (idSquare) => idSquare.id === id
+    )
+    const index = _.flattenDeep(squares).indexOf(squareWithId)
+    let coordinates = []
+    if (index < 10) {
+      coordinates = [0, index]
+    } else {
+      coordinates = Array.from(`${index}`).map((number) => Number(number))
+    }
+
+    return coordinates
+  }
+
   const allSquaresHit = (shipId) => {
     let isSunk = false
     const flatSquares = _.flattenDeep(squares)
@@ -51,6 +66,7 @@ const GameBoard = (square, playerId) => {
     addShip,
     squareAt,
     allSquaresHit,
+    coordinatesOf,
     playerId
   }
 }

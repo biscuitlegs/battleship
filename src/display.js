@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { isOutOfBounds } from './ship'
 
 const Display = () => {
   const createGrid = () => {
@@ -118,11 +119,130 @@ const Display = () => {
     return button
   }
 
+  const dragStartHandler = (e) => {
+    e.dataTransfer.setData('text/plain', e.target.dataset.id)
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const dragoverHandler = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const extendCoordinates = (coordinates, isVertical, times) => {
+    const extendedCoordinates = [coordinates]
+    const currentCoordinate = [...coordinates]
+    for (let i = 0; i < times; i += 1) {
+      if (isVertical) {
+        currentCoordinate[0] += 1
+      } else {
+        currentCoordinate[1] += 1
+      }
+      extendedCoordinates.push([...currentCoordinate])
+    }
+
+    return extendedCoordinates
+  }
+
+  const dropHandler = (e, ships, board) => {
+    e.preventDefault()
+    const squareId = e.target.dataset.id
+    const shipId = e.dataTransfer.getData('text/plain')
+    // Exit if not dropped on a square
+    if (!e.target.classList.contains('square')) {
+      return
+    }
+    const squareCoordinates = board.coordinatesOf(squareId)
+    const ship = ships.find((idShip) => idShip.id === shipId)
+    const shipNewCoordinates = extendCoordinates(
+      squareCoordinates,
+      ship.isVertical,
+      ship.length - 1
+    )
+    // Exit if ship is dropped in the same place
+    if (_.isEqual(ship.positions, shipNewCoordinates)) {
+      return
+    }
+    // Exit if part of ship is out of bounds when dropped
+    if (isOutOfBounds(ship.isVertical, shipNewCoordinates)) {
+      return
+    }
+    ship.positions = shipNewCoordinates
+    const displayShip = document.querySelector(`[data-id=${shipId}]`)
+    e.target.appendChild(displayShip)
+  }
+
+  const createShipRotateButton = (ship) => {
+    let { isVertical } = ship
+    const { length } = ship
+    const rotateButton = document.createElement('button')
+    rotateButton.textContent = 'Rotate'
+    rotateButton.addEventListener('click', (e) => {
+      const originCoordinates = ship.positions[0]
+      const newCoordinates = extendCoordinates(
+        originCoordinates,
+        !isVertical,
+        length - 1
+      )
+      // Exit if part of ship would be out of bounds after rotating
+      if (isOutOfBounds(!isVertical, newCoordinates)) {
+        return
+      }
+      if (isVertical && length === 3) {
+        e.target.parentElement.classList.remove('vertical-3')
+        e.target.parentElement.classList.add('horizontal-3')
+      } else {
+        e.target.parentElement.classList.remove('horizontal-3')
+        e.target.parentElement.classList.add('vertical-3')
+      }
+      isVertical = !isVertical
+      const rotatedShip = ship
+      rotatedShip.isVertical = isVertical
+      rotatedShip.positions = newCoordinates
+    })
+
+    return rotateButton
+  }
+
+  // TODO test for this
+  const createDragShipsDisplay = (ships, gameBoard) => {
+    const { squares } = gameBoard
+    const board = createDisplayBoard(_.flattenDeep(squares))
+    board.childNodes.forEach((square) => {
+      square.addEventListener('dragover', dragoverHandler)
+      square.addEventListener('drop', (e) => {
+        dropHandler(e, ships, gameBoard)
+      })
+    })
+    ships.forEach((ship) => {
+      const { length, isVertical } = ship
+      const display = document.createElement('div')
+      display.setAttribute('draggable', true)
+      display.dataset.id = ship.id
+      display.classList.add('draggable-ship')
+      if (isVertical && length === 3) {
+        display.classList.add('vertical-3')
+      }
+      if (!isVertical && length === 3) {
+        display.classList.add('horizontal-3')
+      }
+      display.addEventListener('dragstart', (e) => {
+        dragStartHandler(e)
+      })
+      const rotateButton = createShipRotateButton(ship)
+      display.appendChild(rotateButton)
+      board.appendChild(display)
+    })
+
+    return board
+  }
+
   return {
     createDisplayBoard,
     createResultsDisplay,
     createNotificationDisplay,
-    createPlayAgainButton
+    createPlayAgainButton,
+    createDragShipsDisplay
   }
 }
 
