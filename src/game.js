@@ -112,6 +112,10 @@ const Game = () => {
       )
 
       displaySquare.addEventListener('click', () => {
+        // Exit early if square has already been clicked
+        if (foundSquare.hasBeenHit) {
+          return
+        }
         // eslint-disable-next-line no-use-before-define
         playTurn(foundSquare)
       })
@@ -218,10 +222,6 @@ const Game = () => {
       }
     )
     document.body.appendChild(boardSetup)
-    window.addEventListener('click', () => {
-      console.log(player1Ships)
-      console.log(player2Ships)
-    })
   }
 
   const loadPlayAgainButton = () => {

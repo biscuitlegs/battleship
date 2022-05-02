@@ -144,6 +144,21 @@ const Display = () => {
     return extendedCoordinates
   }
 
+  const shipHasCollided = (ship, ships) => {
+    let isCollision = false
+    const alliedShipPositions = _.flatten(
+      ships.map((alliedShip) => alliedShip.positions)
+    )
+    ship.positions.forEach((position) => {
+      alliedShipPositions.forEach((alliedPosition) => {
+        if (_.isEqual(position, alliedPosition)) {
+          isCollision = true
+        }
+      })
+    })
+    return isCollision
+  }
+
   const dropHandler = (e, ships, board) => {
     e.preventDefault()
     const squareId = e.target.dataset.id
@@ -165,6 +180,15 @@ const Display = () => {
     }
     // Exit if part of ship is out of bounds when dropped
     if (isOutOfBounds(ship.isVertical, shipNewCoordinates)) {
+      return
+    }
+    // Exit if part of ship collides with another ship
+    if (
+      shipHasCollided(
+        { positions: shipNewCoordinates },
+        ships.filter((alliedShip) => alliedShip !== ship)
+      )
+    ) {
       return
     }
     ship.positions = shipNewCoordinates
@@ -198,7 +222,7 @@ const Display = () => {
     }
   }
 
-  const createShipRotateButton = (ship) => {
+  const createShipRotateButton = (ship, playerShips) => {
     let { isVertical } = ship
     const { length } = ship
     const rotateButton = document.createElement('button')
@@ -213,6 +237,9 @@ const Display = () => {
       )
       // Exit if part of ship would be out of bounds after rotating
       if (isOutOfBounds(!isVertical, newCoordinates)) {
+        return
+      }
+      if (shipHasCollided({ positions: newCoordinates }, playerShips)) {
         return
       }
       isVertical = !isVertical
@@ -231,7 +258,7 @@ const Display = () => {
     const container = document.createElement('div')
     const bench = document.createElement('div')
     const message = document.createElement('p')
-    message.textContent = `${playerName}, please place your ships in secret!`
+    message.innerHTML = `${playerName}, please place <span class="bold">all</span> of your ships on the board (in secret)!`
     bench.classList.add('bench')
     const board = createDisplayBoard(_.flattenDeep(squares))
     board.childNodes.forEach((square) => {
@@ -250,7 +277,10 @@ const Display = () => {
       draggableShip.addEventListener('dragstart', (e) => {
         dragStartHandler(e)
       })
-      const rotateButton = createShipRotateButton(ship)
+      const rotateButton = createShipRotateButton(
+        ship,
+        ships.filter((otherShip) => ship !== otherShip)
+      )
       draggableShip.appendChild(rotateButton)
       bench.appendChild(draggableShip)
     })
@@ -284,12 +314,22 @@ const Display = () => {
     const startGameButton = document.createElement('button')
     startGameButton.textContent = 'Start Game'
     startGameButton.addEventListener('click', () => {
+      const bench = document.querySelector('.bench')
+      // Exit early if not all ships are placed on the board
+      if (bench.childNodes.length > 0) {
+        return
+      }
       document.body.removeChild(container)
       gameStarter()
     })
     const nextBoardButton = document.createElement('button')
     nextBoardButton.textContent = 'Done placing ships'
     nextBoardButton.addEventListener('click', () => {
+      const bench = document.querySelector('.bench')
+      // Exit early if not all ships are placed on the board
+      if (bench.childNodes.length > 0) {
+        return
+      }
       container.removeChild(player1Interface)
       container.removeChild(nextBoardButton)
       container.appendChild(player2Interface)
