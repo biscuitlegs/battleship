@@ -148,7 +148,7 @@ const Display = () => {
     e.preventDefault()
     const squareId = e.target.dataset.id
     const shipId = e.dataTransfer.getData('text/plain')
-    // Exit if not dropped on a square
+    // Exit if not dropped on a square(on another ship or out of bounds)
     if (!e.target.classList.contains('square')) {
       return
     }
@@ -172,12 +172,39 @@ const Display = () => {
     e.target.appendChild(displayShip)
   }
 
+  const addClassesToDraggableShip = (ship, isVertical, length) => {
+    ship.classList.add('draggable-ship')
+    switch (true) {
+      case isVertical && length === 2:
+        ship.classList.add('vertical-2')
+        break
+      case isVertical && length === 3:
+        ship.classList.add('vertical-3')
+        break
+      case isVertical && length === 4:
+        ship.classList.add('vertical-4')
+        break
+      case !isVertical && length === 2:
+        ship.classList.add('horizontal-2')
+        break
+      case !isVertical && length === 3:
+        ship.classList.add('horizontal-3')
+        break
+      case !isVertical && length === 4:
+        ship.classList.add('horizontal-4')
+        break
+      default:
+        break
+    }
+  }
+
   const createShipRotateButton = (ship) => {
     let { isVertical } = ship
     const { length } = ship
     const rotateButton = document.createElement('button')
     rotateButton.textContent = 'Rotate'
     rotateButton.addEventListener('click', (e) => {
+      const draggableShip = e.target.parentElement
       const originCoordinates = ship.positions[0]
       const newCoordinates = extendCoordinates(
         originCoordinates,
@@ -188,25 +215,24 @@ const Display = () => {
       if (isOutOfBounds(!isVertical, newCoordinates)) {
         return
       }
-      if (isVertical && length === 3) {
-        e.target.parentElement.classList.remove('vertical-3')
-        e.target.parentElement.classList.add('horizontal-3')
-      } else {
-        e.target.parentElement.classList.remove('horizontal-3')
-        e.target.parentElement.classList.add('vertical-3')
-      }
       isVertical = !isVertical
       const rotatedShip = ship
       rotatedShip.isVertical = isVertical
       rotatedShip.positions = newCoordinates
+      draggableShip.classList.remove(...draggableShip.classList)
+      addClassesToDraggableShip(draggableShip, isVertical, length)
     })
 
     return rotateButton
   }
 
-  // TODO test for this
-  const createDragShipsDisplay = (ships, gameBoard) => {
+  const createDragShipsDisplay = (ships, gameBoard, playerName) => {
     const { squares } = gameBoard
+    const container = document.createElement('div')
+    const bench = document.createElement('div')
+    const message = document.createElement('p')
+    message.textContent = `${playerName}, please place your ships in secret!`
+    bench.classList.add('bench')
     const board = createDisplayBoard(_.flattenDeep(squares))
     board.childNodes.forEach((square) => {
       square.addEventListener('dragover', dragoverHandler)
@@ -214,27 +240,66 @@ const Display = () => {
         dropHandler(e, ships, gameBoard)
       })
     })
+
     ships.forEach((ship) => {
       const { length, isVertical } = ship
-      const display = document.createElement('div')
-      display.setAttribute('draggable', true)
-      display.dataset.id = ship.id
-      display.classList.add('draggable-ship')
-      if (isVertical && length === 3) {
-        display.classList.add('vertical-3')
-      }
-      if (!isVertical && length === 3) {
-        display.classList.add('horizontal-3')
-      }
-      display.addEventListener('dragstart', (e) => {
+      const draggableShip = document.createElement('div')
+      draggableShip.setAttribute('draggable', true)
+      draggableShip.dataset.id = ship.id
+      addClassesToDraggableShip(draggableShip, isVertical, length)
+      draggableShip.addEventListener('dragstart', (e) => {
         dragStartHandler(e)
       })
       const rotateButton = createShipRotateButton(ship)
-      display.appendChild(rotateButton)
-      board.appendChild(display)
+      draggableShip.appendChild(rotateButton)
+      bench.appendChild(draggableShip)
     })
 
-    return board
+    container.appendChild(message)
+    container.appendChild(board)
+    container.appendChild(bench)
+
+    return container
+  }
+
+  // TODO test for this
+  const createPlaceShipsDisplay = (
+    gameboard1,
+    gameboard2,
+    ships1,
+    ships2,
+    gameStarter
+  ) => {
+    const player1Interface = createDragShipsDisplay(
+      ships1,
+      gameboard2,
+      'Player 1'
+    )
+    const player2Interface = createDragShipsDisplay(
+      ships2,
+      gameboard1,
+      'Player 2'
+    )
+    const container = document.createElement('div')
+    const startGameButton = document.createElement('button')
+    startGameButton.textContent = 'Start Game'
+    startGameButton.addEventListener('click', () => {
+      document.body.removeChild(container)
+      gameStarter()
+    })
+    const nextBoardButton = document.createElement('button')
+    nextBoardButton.textContent = 'Done placing ships'
+    nextBoardButton.addEventListener('click', () => {
+      container.removeChild(player1Interface)
+      container.removeChild(nextBoardButton)
+      container.appendChild(player2Interface)
+      container.appendChild(startGameButton)
+    })
+
+    container.appendChild(player1Interface)
+    container.appendChild(nextBoardButton)
+
+    return container
   }
 
   return {
@@ -242,7 +307,7 @@ const Display = () => {
     createResultsDisplay,
     createNotificationDisplay,
     createPlayAgainButton,
-    createDragShipsDisplay
+    createPlaceShipsDisplay
   }
 }
 

@@ -14,38 +14,38 @@ const Game = () => {
     createResultsDisplay,
     createNotificationDisplay,
     createPlayAgainButton,
-    createDragShipsDisplay
+    createPlaceShipsDisplay
   } = Display()
+
+  const createDefaultShips = (playerId) => {
+    const defaultShips = [
+      Ship(uniqid(), playerId, false, false, [
+        [0, 0],
+        [0, 1]
+      ]),
+      Ship(uniqid(), playerId, false, false, [
+        [5, 0],
+        [6, 0],
+        [7, 0]
+      ]),
+      Ship(uniqid(), playerId, false, false, [
+        [3, 0],
+        [3, 1],
+        [3, 2],
+        [3, 3]
+      ])
+    ]
+
+    return defaultShips
+  }
+
   const players = [Player(uniqid(), 'Mark'), Player(uniqid(), 'Emma')]
   let turnPlayer = players[0]
-  let player1Ships = [
-    Ship(uniqid(), players[0].id, false, false, [
-      [0, 0],
-      [0, 1],
-      [0, 2]
-    ])
-  ]
-  let player2Ships = [
-    Ship(uniqid(), players[1].id, false, false, [
-      [3, 0],
-      [3, 1]
-    ]),
-    Ship(uniqid(), players[1].id, false, false, [
-      [5, 3],
-      [5, 4]
-    ])
-  ]
+  let player1Ships = createDefaultShips(players[0].id)
+  let player2Ships = createDefaultShips(players[1].id)
   let player1GameBoard = GameBoard(Square, players[0].id)
   let player2GameBoard = GameBoard(Square, players[1].id)
   let turnGameBoard = player1GameBoard
-  // Player 1's board only has player 2's ships and vice versa because
-  // each player should only fight their opponent's ships
-  player1Ships.forEach((ship) => {
-    player2GameBoard.addShip(ship.id, ship.positions)
-  })
-  player2Ships.forEach((ship) => {
-    player1GameBoard.addShip(ship.id, ship.positions)
-  })
 
   const sleep = (microseconds) =>
     new Promise((resolve) => {
@@ -199,8 +199,29 @@ const Game = () => {
   }
 
   const play = () => {
-    loadTurnNotification()
-    loadDisplayBoard()
+    const boardSetup = createPlaceShipsDisplay(
+      player1GameBoard,
+      player2GameBoard,
+      player1Ships,
+      player2Ships,
+      () => {
+        // Player 1's board only has player 2's ships and vice versa because
+        // each player should only fight their opponent's ships
+        player1Ships.forEach((ship) => {
+          player2GameBoard.addShip(ship.id, ship.positions)
+        })
+        player2Ships.forEach((ship) => {
+          player1GameBoard.addShip(ship.id, ship.positions)
+        })
+        loadTurnNotification()
+        loadDisplayBoard()
+      }
+    )
+    document.body.appendChild(boardSetup)
+    window.addEventListener('click', () => {
+      console.log(player1Ships)
+      console.log(player2Ships)
+    })
   }
 
   const loadPlayAgainButton = () => {
@@ -209,43 +230,15 @@ const Game = () => {
       document.body.innerHTML = ''
       // eslint-disable-next-line prefer-destructuring
       turnPlayer = players[0]
-      player1Ships = [
-        Ship(uniqid(), players[0].id, false, [
-          [0, 0],
-          [0, 1]
-        ]),
-        Ship(uniqid(), players[0].id, false, [
-          [1, 4],
-          [1, 5]
-        ])
-      ]
-      player2Ships = [
-        Ship(uniqid(), players[1].id, false, [
-          [3, 0],
-          [3, 1]
-        ]),
-        Ship(uniqid(), players[1].id, false, [
-          [5, 3],
-          [5, 4]
-        ])
-      ]
+      player1Ships = createDefaultShips(players[0].id)
+      player2Ships = createDefaultShips(players[1].id)
       player1GameBoard = GameBoard(Square, players[0].id)
       player2GameBoard = GameBoard(Square, players[1].id)
       turnGameBoard = player1GameBoard
-      player1Ships.forEach((ship) => {
-        player2GameBoard.addShip(ship.id, ship.positions)
-      })
-      player2Ships.forEach((ship) => {
-        player1GameBoard.addShip(ship.id, ship.positions)
-      })
       play()
     })
     document.body.appendChild(button)
   }
-
-  document.body.appendChild(
-    createDragShipsDisplay(player1Ships, player1GameBoard)
-  )
 
   return {
     play

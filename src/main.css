@@ -87,10 +87,15 @@ div .revealed {
 }
 
 .draggable-ship {
-  position: absolute;
+  position: relative;
   box-sizing: border-box;
   background-color: var(--red);
   border: 1px solid var(--black);
+}
+
+.horizontal-2 {
+  width: 100px;
+  height: 50px;
 }
 
 .horizontal-3 {
@@ -98,7 +103,31 @@ div .revealed {
   height: 50px;
 }
 
+.horizontal-4 {
+  width: 200px;
+  height: 50px;
+}
+
+.vertical-2 {
+  width: 50px;
+  height: 100px;
+}
+
 .vertical-3 {
   width: 50px;
   height: 150px;
+}
+
+.vertical-4 {
+  width: 50px;
+  height: 200px;
+}
+
+.bench {
+  width: 500px;
+  border: 1px solid black;
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  padding: 10px;
 }
