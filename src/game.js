@@ -5,6 +5,8 @@ import Square from './square'
 import { Ship } from './ship'
 import Display from './display'
 import Player from './player'
+import 'bulma/css/bulma.min.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import './main.css'
 
@@ -39,7 +41,9 @@ const Game = () => {
     return defaultShips
   }
 
-  const players = [Player(uniqid(), 'Mark'), Player(uniqid(), 'Emma')]
+  const mainContainer = document.createElement('div')
+  mainContainer.setAttribute('id', 'mainContainer')
+  const players = [Player(uniqid(), 'Player 1'), Player(uniqid(), 'Player 2')]
   let turnPlayer = players[0]
   let player1Ships = createDefaultShips(players[0].id)
   let player2Ships = createDefaultShips(players[1].id)
@@ -131,13 +135,13 @@ const Game = () => {
     const displaySquares = _.flattenDeep(turnGameBoard.squares)
     const displayBoard = createDisplayBoard(displaySquares)
     displayBoard.setAttribute('id', 'displayBoard')
-    document.body.appendChild(displayBoard)
+    mainContainer.appendChild(displayBoard)
     makeSquaresInteractive(displayBoard)
   }
 
   const unloadDisplayBoard = () => {
     const displayBoard = document.body.querySelector('#displayBoard')
-    document.body.removeChild(displayBoard)
+    mainContainer.removeChild(displayBoard)
   }
 
   const reloadDisplayBoard = () => {
@@ -162,7 +166,11 @@ const Game = () => {
       players[0].id,
       turnPlayer.id
     )
-    document.body.appendChild(resultsDisplay)
+    const title = document.createElement('h1')
+    title.textContent = 'Results'
+    title.classList.add('is-size-1')
+    mainContainer.appendChild(title)
+    mainContainer.appendChild(resultsDisplay)
   }
 
   const loadTurnNotification = () => {
@@ -170,12 +178,12 @@ const Game = () => {
       `It's ${turnPlayer.name}'s turn.`
     )
     turnNotification.setAttribute('id', 'turnNotification')
-    document.body.appendChild(turnNotification)
+    mainContainer.appendChild(turnNotification)
   }
 
   const unloadTurnNotification = () => {
     const turnNotification = document.querySelector('#turnNotification')
-    document.body.removeChild(turnNotification)
+    mainContainer.removeChild(turnNotification)
   }
 
   const playTurn = (square) => {
@@ -217,8 +225,11 @@ const Game = () => {
         player2Ships.forEach((ship) => {
           player1GameBoard.addShip(ship.id, ship.positions)
         })
+
+        document.body.removeChild(boardSetup)
         loadTurnNotification()
         loadDisplayBoard()
+        document.body.appendChild(mainContainer)
       }
     )
     document.body.appendChild(boardSetup)
@@ -227,7 +238,8 @@ const Game = () => {
   const loadPlayAgainButton = () => {
     const button = createPlayAgainButton()
     button.addEventListener('click', () => {
-      document.body.innerHTML = ''
+      mainContainer.innerHTML = ''
+      document.body.removeChild(mainContainer)
       // eslint-disable-next-line prefer-destructuring
       turnPlayer = players[0]
       player1Ships = createDefaultShips(players[0].id)
@@ -237,7 +249,7 @@ const Game = () => {
       turnGameBoard = player1GameBoard
       play()
     })
-    document.body.appendChild(button)
+    mainContainer.appendChild(button)
   }
 
   return {

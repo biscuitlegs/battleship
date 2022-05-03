@@ -112,3 +112,35 @@ describe('Should return a display board element', () => {
     ).toBeTruthy()
   })
 })
+
+test('Should return an interface for dragging ships onto a board', () => {
+  const mockGameBoard = jest.fn().mockReturnValue({
+    squares: Array(100).fill({
+      id: 1,
+      shipId: null,
+      hasBeenHit: false,
+      hasBeenSunk: false
+    })
+  })
+  const mockShip = jest.fn().mockReturnValue({
+    id: 1,
+    playerId: 1,
+    isSunk: false,
+    isVertical: false,
+    positions: [[0, 0]]
+  })
+  const gameBoard1 = mockGameBoard()
+  const gameBoard2 = mockGameBoard()
+  const ships1 = [mockShip()]
+  const ships2 = [mockShip()]
+  const mockGameStarter = () => {}
+  const dragInterface = testDisplay.createPlaceShipsDisplay(
+    gameBoard1,
+    gameBoard2,
+    ships1,
+    ships2,
+    mockGameStarter
+  )
+
+  expect(dragInterface.id).toBe('dragContainer')
+})

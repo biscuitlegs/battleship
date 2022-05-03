@@ -71,6 +71,8 @@ const Display = () => {
     const resultsDisplay = document.createElement('div')
     const player1NameDisplay = document.createElement('h3')
     const player2NameDisplay = document.createElement('h3')
+    player1NameDisplay.classList.add('is-size-3')
+    player2NameDisplay.classList.add('is-size-3')
     if (winningPlayerId === player1Id) {
       player1NameDisplay.textContent = `${player1Name} wins!`
       player2NameDisplay.textContent = player2Name
@@ -105,7 +107,7 @@ const Display = () => {
 
   const createNotificationDisplay = (text) => {
     const notification = document.createElement('div')
-    notification.classList.add('notification')
+    notification.classList.add('notification', 'is-info', 'turn-notification')
     notification.textContent = text
 
     return notification
@@ -114,7 +116,7 @@ const Display = () => {
   const createPlayAgainButton = () => {
     const button = document.createElement('button')
     button.textContent = 'Play again'
-    button.classList.add('button')
+    button.classList.add('button', 'is-fullwidth', 'is-medium', 'is-primary')
 
     return button
   }
@@ -226,9 +228,12 @@ const Display = () => {
     let { isVertical } = ship
     const { length } = ship
     const rotateButton = document.createElement('button')
-    rotateButton.textContent = 'Rotate'
+    rotateButton.classList.add('button', 'is-link', 'rotate-button')
+    const icon = document.createElement('i')
+    icon.classList.add('bi', 'bi-arrow-clockwise')
+    rotateButton.appendChild(icon)
     rotateButton.addEventListener('click', (e) => {
-      const draggableShip = e.target.parentElement
+      const draggableShip = e.currentTarget.parentElement
       const originCoordinates = ship.positions[0]
       const newCoordinates = extendCoordinates(
         originCoordinates,
@@ -258,6 +263,7 @@ const Display = () => {
     const container = document.createElement('div')
     const bench = document.createElement('div')
     const message = document.createElement('p')
+    message.classList.add('notification', 'is-info')
     message.innerHTML = `${playerName}, please place <span class="bold">all</span> of your ships on the board (in secret)!`
     bench.classList.add('bench')
     const board = createDisplayBoard(_.flattenDeep(squares))
@@ -311,19 +317,21 @@ const Display = () => {
       'Player 2'
     )
     const container = document.createElement('div')
+    container.setAttribute('id', 'dragContainer')
     const startGameButton = document.createElement('button')
     startGameButton.textContent = 'Start Game'
+    startGameButton.classList.add('button', 'is-primary', 'drag-button')
     startGameButton.addEventListener('click', () => {
       const bench = document.querySelector('.bench')
       // Exit early if not all ships are placed on the board
       if (bench.childNodes.length > 0) {
         return
       }
-      document.body.removeChild(container)
       gameStarter()
     })
     const nextBoardButton = document.createElement('button')
-    nextBoardButton.textContent = 'Done placing ships'
+    nextBoardButton.textContent = 'Done'
+    nextBoardButton.classList.add('button', 'is-primary', 'drag-button')
     nextBoardButton.addEventListener('click', () => {
       const bench = document.querySelector('.bench')
       // Exit early if not all ships are placed on the board
